@@ -20,6 +20,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Android SDK Build Tools
+        uses: android-actions/setup-android@v3
+
       - name: Compile, Dex, and Package Plugin
         run: |
           VERSION=$(echo "${{ github.event.release.tag_name }}" | sed 's/^v//')
@@ -28,12 +31,12 @@ jobs:
           # 1. Compile Java source code against the standard JDK
           javac -source 17 -target 17 -d build src/me/jxl/kiosk/plugins/cleaner/WidgetCleanerPlugin.java
           
-          # 2. Convert compiled Java classes into Android DEX bytecode format using pre-installed Android SDK tools
+          # 2. Convert compiled Java classes into Android DEX bytecode format
           $ANDROID_HOME/build-tools/35.0.0/d8 --output intermediate build/me/jxl/kiosk/plugins/cleaner/WidgetCleanerPlugin.class
           
-          # 3. Pack classes.dex into the root of plugin.jar container
+          # 3. Pack classes.dex into the root of plugin.jar (M flag prevents META-INF manifest creation)
           cd intermediate
-          jar cvf ../dist/plugin.jar classes.dex
+          jar cvfM ../dist/plugin.jar classes.dex
           cd ..
           
           # 4. Stage rest of manifest items into the production distribution folder
