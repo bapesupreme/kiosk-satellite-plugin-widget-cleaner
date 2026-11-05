@@ -8,7 +8,7 @@ import java.util.Map;
 public class WidgetCleanerPlugin implements KioskPlugin {
     private PluginHost host;
     private boolean isAutomationEnabled = true;
-    private String targetModePreference = "Black";
+    private String targetModePreference = "black";
     private boolean hideClockPreference = true;
     private boolean hideForecastPreference = true;
     private boolean hideEntityPreference = true;
@@ -79,7 +79,7 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         
         if (!updates.isEmpty()) {
             host.updateSettings(updates);
-            host.log("Target screensaver (" + targetModePreference + ") matched. Cleaning selected overlays.");
+            host.log("Target screensaver matched. Hiding selected overlays.");
             widgetsAreHidden = true;
         }
     }
@@ -89,22 +89,14 @@ public class WidgetCleanerPlugin implements KioskPlugin {
 
         Map<String, Object> updates = new HashMap<>();
         
-        if (hideClockPreference) {
-            updates.put("widget.small_clock.enabled", true);
-            updates.put("widget.small_clock.show_date", true);
-        }
-        if (hideForecastPreference) {
-            updates.put("widget.weather_forecast.enabled", true);
-        }
-        if (hideEntityPreference) {
-            updates.put("widget.ha_entity.enabled", true);
-        }
+        updates.put("widget.small_clock.enabled", true);
+        updates.put("widget.small_clock.show_date", true);
+        updates.put("widget.weather_forecast.enabled", true);
+        updates.put("widget.ha_entity.enabled", true);
         
-        if (!updates.isEmpty()) {
-            host.updateSettings(updates);
-            host.log("Target screensaver exited. Overlays cleanly restored.");
-            widgetsAreHidden = false;
-        }
+        host.updateSettings(updates);
+        host.log("Target screensaver exited. Overlays cleanly restored.");
+        widgetsAreHidden = false;
     }
 
     @Override
