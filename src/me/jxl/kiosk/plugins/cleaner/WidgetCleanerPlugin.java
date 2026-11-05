@@ -8,11 +8,18 @@ import java.util.Map;
 public class WidgetCleanerPlugin implements KioskPlugin {
     private PluginHost host;
     private boolean isAutomationEnabled = true;
-    private String targetModePreference = "black";
+    private String targetModePreference = "Black";
     private boolean hideClockPreference = true;
     private boolean hideForecastPreference = true;
     private boolean hideEntityPreference = true;
     private boolean widgetsAreHidden = false;
+
+    // Ordered list matching the manifest options exactly to verify mode indexes
+    private static final String[] MODES = {
+        "weather mood", "celestial", "calendar", "dim", "black", "clock",
+        "home assistant media", "local media", "photo gallery", "image url",
+        "immich media", "website", "camera streams", "home assistant dashboard"
+    };
 
     @Override
     public void start(PluginHost hostHandle, Map<String, Object> settings) {
@@ -48,8 +55,8 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         if ("screensaver.started".equals(event) || "screensaver.changed".equals(event)) {
             if (payload != null) {
                 String currentMode = (String) payload.get("mode");
-
-                if (targetModePreference != null && targetModePreference.equalsIgnoreCase(currentMode)) {
+                
+                if (isTargetMatch(currentMode)) {
                     applyWidgetCleaning();
                 } else if (widgetsAreHidden) {
                     restoreWidgetCleaning();
@@ -59,6 +66,15 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         else if ("screensaver.stopped".equals(event)) {
             restoreWidgetCleaning();
         }
+    }
+
+    private boolean isTargetMatch(String currentMode) {
+        if (currentMode == null || targetModePreference == null) return false;
+        
+        String cleanCurrent = currentMode.replace("_", " ").trim().toLowerCase();
+        String cleanTarget = targetModePreference.replace("_", " ").trim().toLowerCase();
+        
+        return cleanCurrent.equalsIgnoreCase(cleanTarget);
     }
 
     private void applyWidgetCleaning() {
@@ -79,7 +95,7 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         
         if (!updates.isEmpty()) {
             host.updateSettings(updates);
-            host.log("Target screensaver matched. Hiding selected overlays.");
+            host.log("Screensaver matched. Hiding selected overlays.");
             widgetsAreHidden = true;
         }
     }
@@ -95,7 +111,7 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         updates.put("widget.ha_entity.enabled", true);
         
         host.updateSettings(updates);
-        host.log("Target screensaver exited. Overlays cleanly restored.");
+        host.log("Screensaver exited. Overlays cleanly restored.");
         widgetsAreHidden = false;
     }
 
