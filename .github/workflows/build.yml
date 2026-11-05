@@ -26,7 +26,7 @@ jobs:
           mkdir -p build intermediate dist
           
           # 1. Compile Java source code against the standard JDK
-          javac -source 17 -target 17 -d build src/me/jxl/kiosk/plugins/cleaner/WidgetCleanerPlugin.java
+          javac -source 17 -target 17 -d build src/me/jxl/kiosk/plugins/KioskPlugin.java src/me/jxl/kiosk/plugins/PluginHost.java src/me/jxl/kiosk/plugins/cleaner/WidgetCleanerPlugin.java
           
           # 2. Convert compiled Java classes into Android DEX bytecode format using pre-installed tools
           $ANDROID_HOME/build-tools/35.0.0/d8 --output intermediate build/me/jxl/kiosk/plugins/cleaner/WidgetCleanerPlugin.class
