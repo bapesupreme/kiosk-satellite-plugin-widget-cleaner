@@ -38,8 +38,9 @@ public class WidgetCleanerPlugin implements KioskPlugin {
             this.hideEntityPreference = (boolean) settings.get("hide_entity");
         }
     }
+
     @Override
-    public void onEvent(String event, Map<String, Object> payload) { // Changed signature
+    public void onEvent(String event, Map<String, Object> payload) {
         if (!isAutomationEnabled || host == null) {
             return;
         }
@@ -54,11 +55,6 @@ public class WidgetCleanerPlugin implements KioskPlugin {
                     restoreWidgetCleaning();
                 }
             }
-        } 
-        else if ("screensaver.stopped".equals(event)) {
-            restoreWidgetCleaning();
-        }
-    }
         } 
         else if ("screensaver.stopped".equals(event)) {
             restoreWidgetCleaning();
