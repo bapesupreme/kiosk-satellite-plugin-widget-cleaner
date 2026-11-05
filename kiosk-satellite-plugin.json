@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "apiVersion": 1,
+  "id": "screensaver-widget-cleaner",
+  "name": "Screensaver Widget Cleaner",
+  "version": "1.2.0",
+  "minAndroidSdk": 24,
+  "minAppVersion": "2026.10.42",
+  "entryClass": "me.jxl.kiosk.plugins.cleaner.WidgetCleanerPlugin",
+  "description": "Automatically keeps screensavers clutter-free. This plugin monitors active Kiosk Satellite screensavers and hides selected corner overlays—including the small clock, weather forecasts, and Home Assistant entity badges—whenever your chosen mode triggers.",
+  "author": "Developer",
+  "license": "Apache-2.0",
+  "capabilities": ["host.read", "host.control"],
+  "groups": [
+    {
+      "title": "Widget Automation Setup"
+    }
+  ],
+  "settings": [
+    {
+      "key": "enabled",
+      "type": "boolean",
+      "title": "Enable Automation",
+      "group": "Widget Automation Setup",
+      "default": true
+    },
+    {
+      "key": "target_mode",
+      "type": "select",
+      "title": "Target Screensaver",
+      "group": "Widget Automation Setup",
+      "default": "Black",
+      "options": [
+        "Weather Mood",
+        "Celestial",
+        "Calendar",
+        "Dim",
+        "Black",
+        "Clock",
+        "Home Assistant Media",
+        "Local Media",
+        "Photo Gallery",
+        "Image URL",
+        "Immich Media",
+        "Website",
+        "Camera Streams",
+        "Home Assistant Dashboard"
+      ],
+      "visibleWhen": { "key": "enabled", "equals": true }
+    },
+    {
+      "key": "hide_clock",
+      "type": "boolean",
+      "title": "Hide Small Clock & Date",
+      "group": "Widget Automation Setup",
+      "default": true,
+      "visibleWhen": { "key": "enabled", "equals": true }
+    },
+    {
+      "key": "hide_forecast",
+      "type": "boolean",
+      "title": "Hide Weather Forecast",
+      "group": "Widget Automation Setup",
+      "default": true,
+      "visibleWhen": { "key": "enabled", "equals": true }
+    },
+    {
+      "key": "hide_entity",
+      "type": "boolean",
+      "title": "Hide HA Entity Widget",
+      "group": "Widget Automation Setup",
+      "default": true,
+      "visibleWhen": { "key": "enabled", "equals": true }
+    }
+  ]
+}
