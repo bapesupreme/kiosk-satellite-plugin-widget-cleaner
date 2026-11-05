@@ -1,0 +1,63 @@
+name: Build and Release Plugin
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK Build Tools
+        uses: android-actions/setup-android@v3
+
+      - name: Compile, Dex, and Package Plugin
+        run: |
+          VERSION=$(echo "${{ github.event.release.tag_name }}" | sed 's/^v//')
+          mkdir -p build intermediate dist
+          
+          # 1. Compile Java source code against the standard JDK
+          javac -source 17 -target 17 -d build src/me/jxl/kiosk/plugins/cleaner/WidgetCleanerPlugin.java
+          
+          # 2. Convert compiled Java classes into Android DEX bytecode format (classes.dex)
+          $ANDROID_HOME/build-tools/35.0.0/d8 --output intermediate build/me/jxl/kiosk/plugins/cleaner/WidgetCleanerPlugin.class
+          
+          # 3. Pack classes.dex into the root of plugin.jar container
+          cd intermediate
+          jar cvf ../dist/plugin.jar classes.dex
+          cd ..
+          
+          # 4. Stage rest of manifest items into the production distribution folder
+          cp kiosk-satellite-plugin.json dist/
+          cp LICENSE dist/ 2>/dev/null || touch dist/LICENSE
+          
+          # 5. Compress components cleanly into your final distributable zip package
+          cd dist
+          zip -r ../kiosk-satellite-plugin-widget-cleaner-$VERSION.zip kiosk-satellite-plugin.json plugin.jar LICENSE
+          cd ..
+          
+          # 6. Generate the required SHA-256 validation file for Kiosk Satellite store matching
+          sha256sum kiosk-satellite-plugin-widget-cleaner-$VERSION.zip > dist/kiosk-satellite-plugin-widget-cleaner-$VERSION.zip.sha256
+          cp kiosk-satellite-plugin.json dist/
+
+      - name: Upload Verified Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/kiosk-satellite-plugin.json
+            *.zip
+            dist/*.zip.sha256
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
