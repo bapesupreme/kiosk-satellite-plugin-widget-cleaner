@@ -10,16 +10,13 @@ public class WidgetCleanerPlugin implements KioskPlugin {
     private boolean isAutomationEnabled = true;
     private String targetModePreference = "Black";
     private boolean hideClockPreference = true;
+    private boolean hideWeatherPreference = true;
     private boolean hideForecastPreference = true;
+    private boolean hideBatteryPreference = true;
+    private boolean hideAlarmPreference = true;
+    private boolean hideUpNextPreference = true;
     private boolean hideEntityPreference = true;
     private boolean widgetsAreHidden = false;
-
-    // Ordered list matching the manifest options exactly to verify mode indexes
-    private static final String[] MODES = {
-        "weather mood", "celestial", "calendar", "dim", "black", "clock",
-        "home assistant media", "local media", "photo gallery", "image url",
-        "immich media", "website", "camera streams", "home assistant dashboard"
-    };
 
     @Override
     public void start(PluginHost hostHandle, Map<String, Object> settings) {
@@ -35,15 +32,13 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         if (settings.containsKey("target_mode")) {
             this.targetModePreference = (String) settings.get("target_mode");
         }
-        if (settings.containsKey("hide_clock")) {
-            this.hideClockPreference = (boolean) settings.get("hide_clock");
-        }
-        if (settings.containsKey("hide_forecast")) {
-            this.hideForecastPreference = (boolean) settings.get("hide_forecast");
-        }
-        if (settings.containsKey("hide_entity")) {
-            this.hideEntityPreference = (boolean) settings.get("hide_entity");
-        }
+        if (settings.containsKey("hide_clock")) { this.hideClockPreference = (boolean) settings.get("hide_clock"); }
+        if (settings.containsKey("hide_weather")) { this.hideWeatherPreference = (boolean) settings.get("hide_weather"); }
+        if (settings.containsKey("hide_forecast")) { this.hideForecastPreference = (boolean) settings.get("hide_forecast"); }
+        if (settings.containsKey("hide_battery")) { this.hideBatteryPreference = (boolean) settings.get("hide_battery"); }
+        if (settings.containsKey("hide_alarm")) { this.hideAlarmPreference = (boolean) settings.get("hide_alarm"); }
+        if (settings.containsKey("hide_up_next")) { this.hideUpNextPreference = (boolean) settings.get("hide_up_next"); }
+        if (settings.containsKey("hide_entity")) { this.hideEntityPreference = (boolean) settings.get("hide_entity"); }
     }
 
     @Override
@@ -70,10 +65,8 @@ public class WidgetCleanerPlugin implements KioskPlugin {
 
     private boolean isTargetMatch(String currentMode) {
         if (currentMode == null || targetModePreference == null) return false;
-        
         String cleanCurrent = currentMode.replace("_", " ").trim().toLowerCase();
         String cleanTarget = targetModePreference.replace("_", " ").trim().toLowerCase();
-        
         return cleanCurrent.equalsIgnoreCase(cleanTarget);
     }
 
@@ -86,12 +79,12 @@ public class WidgetCleanerPlugin implements KioskPlugin {
             updates.put("widget.small_clock.enabled", false);
             updates.put("widget.small_clock.show_date", false);
         }
-        if (hideForecastPreference) {
-            updates.put("widget.weather_forecast.enabled", false);
-        }
-        if (hideEntityPreference) {
-            updates.put("widget.ha_entity.enabled", false);
-        }
+        if (hideWeatherPreference) { updates.put("widget.weather.enabled", false); }
+        if (hideForecastPreference) { updates.put("widget.weather_forecast.enabled", false); }
+        if (hideBatteryPreference) { updates.put("widget.battery.enabled", false); }
+        if (hideAlarmPreference) { updates.put("widget.next_alarm.enabled", false); }
+        if (hideUpNextPreference) { updates.put("widget.up_next.enabled", false); }
+        if (hideEntityPreference) { updates.put("widget.ha_entity.enabled", false); }
         
         if (!updates.isEmpty()) {
             host.updateSettings(updates);
@@ -107,7 +100,11 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         
         updates.put("widget.small_clock.enabled", true);
         updates.put("widget.small_clock.show_date", true);
+        updates.put("widget.weather.enabled", true);
         updates.put("widget.weather_forecast.enabled", true);
+        updates.put("widget.battery.enabled", true);
+        updates.put("widget.next_alarm.enabled", true);
+        updates.put("widget.up_next.enabled", true);
         updates.put("widget.ha_entity.enabled", true);
         
         host.updateSettings(updates);
