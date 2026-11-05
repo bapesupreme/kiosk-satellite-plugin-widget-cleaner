@@ -3,11 +3,11 @@
   "apiVersion": 1,
   "id": "screensaver-widget-cleaner",
   "name": "Screensaver Widget Cleaner",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "minAndroidSdk": 24,
   "minAppVersion": "2026.10.42",
   "entryClass": "me.jxl.kiosk.plugins.cleaner.WidgetCleanerPlugin",
-  "description": "Automatically keeps screensavers clutter-free. This plugin monitors active Kiosk Satellite screensavers and hides selected corner overlays—including the small clock, weather forecasts, and Home Assistant entity badges—whenever your chosen mode triggers.",
+  "description": "Automatically keeps screensavers clutter-free. This plugin monitors active Kiosk Satellite screensavers and hides selected corner overlays—including clocks, weather forecasts, battery bars, and alarms—whenever your chosen mode triggers.",
   "author": "Developer",
   "license": "Apache-2.0",
   "capabilities": ["host.read", "host.control"],
@@ -57,9 +57,41 @@
       "visibleWhen": { "key": "enabled", "equals": true }
     },
     {
+      "key": "hide_weather",
+      "type": "boolean",
+      "title": "Hide Current Weather",
+      "group": "Widget Automation Setup",
+      "default": true,
+      "visibleWhen": { "key": "enabled", "equals": true }
+    },
+    {
       "key": "hide_forecast",
       "type": "boolean",
       "title": "Hide Weather Forecast",
+      "group": "Widget Automation Setup",
+      "default": true,
+      "visibleWhen": { "key": "enabled", "equals": true }
+    },
+    {
+      "key": "hide_battery",
+      "type": "boolean",
+      "title": "Hide Battery Meter",
+      "group": "Widget Automation Setup",
+      "default": true,
+      "visibleWhen": { "key": "enabled", "equals": true }
+    },
+    {
+      "key": "hide_alarm",
+      "type": "boolean",
+      "title": "Hide Next Alarm",
+      "group": "Widget Automation Setup",
+      "default": true,
+      "visibleWhen": { "key": "enabled", "equals": true }
+    },
+    {
+      "key": "hide_up_next",
+      "type": "boolean",
+      "title": "Hide Up Next (Calendar)",
       "group": "Widget Automation Setup",
       "default": true,
       "visibleWhen": { "key": "enabled", "equals": true }
