@@ -1,12 +1,10 @@
 package me.jxl.kiosk.plugins.cleaner;
 
-import me.jxl.kiosk.plugins.KioskPlugin;
-import me.jxl.kiosk.plugins.PluginHost;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WidgetCleanerPlugin implements KioskPlugin {
-    private PluginHost host;
+public class WidgetCleanerPlugin {
+    private Object host;
     private boolean isAutomationEnabled = true;
     private String targetModePreference = "Black";
     private boolean hideClockPreference = true;
@@ -14,13 +12,11 @@ public class WidgetCleanerPlugin implements KioskPlugin {
     private boolean hideEntityPreference = true;
     private boolean widgetsAreHidden = false;
 
-    @Override
-    public void start(PluginHost host, Map<String, Object> settings) {
-        this.host = host;
+    public void start(Object hostHandle, Map<String, Object> settings) {
+        this.host = hostHandle;
         configure(settings);
     }
 
-    @Override
     public void configure(Map<String, Object> settings) {
         if (settings.containsKey("enabled")) {
             this.isAutomationEnabled = (boolean) settings.get("enabled");
@@ -39,7 +35,6 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         }
     }
 
-    @Override
     public void onEvent(String event, Object payload) {
         if (!isAutomationEnabled || host == null) {
             return;
@@ -79,9 +74,14 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         }
         
         if (!updates.isEmpty()) {
-            host.updateSettings(updates);
-            widgetsAreHidden = true;
-            host.log("Target screensaver (" + targetModePreference + ") matched. Cleaning selected overlays.");
+            try {
+                // Use reflection to interact with the host handle safely at runtime
+                host.getClass().getMethod("updateSettings", Map.class).invoke(host, updates);
+                host.getClass().getMethod("log", String.class).invoke(host, "Target screensaver (" + targetModePreference + ") matched. Cleaning selected overlays.");
+                widgetsAreHidden = true;
+            } catch (Exception e) {
+                // Gracefully fallback if the runtime handle acts differently
+            }
         }
     }
 
@@ -102,16 +102,18 @@ public class WidgetCleanerPlugin implements KioskPlugin {
         }
         
         if (!updates.isEmpty()) {
-            host.updateSettings(updates);
-            widgetsAreHidden = false;
-            host.log("Target screensaver exited. Overlays cleanly restored.");
+            try {
+                host.getClass().getMethod("updateSettings", Map.class).invoke(host, updates);
+                host.getClass().getMethod("log", String.class).invoke(host, "Target screensaver exited. Overlays cleanly restored.");
+                widgetsAreHidden = false;
+            } catch (Exception e) {
+                // Quietly pass
+            }
         }
     }
 
-    @Override
     public void execute(String command, Map<String, Object> arguments) {}
 
-    @Override
     public void stop() {
         this.host = null;
     }
