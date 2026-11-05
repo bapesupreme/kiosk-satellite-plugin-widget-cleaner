@@ -38,17 +38,15 @@ public class WidgetCleanerPlugin implements KioskPlugin {
             this.hideEntityPreference = (boolean) settings.get("hide_entity");
         }
     }
-
     @Override
-    public void onEvent(String event, Object payload) {
+    public void onEvent(String event, Map<String, Object> payload) { // Changed signature
         if (!isAutomationEnabled || host == null) {
             return;
         }
 
         if ("screensaver.started".equals(event) || "screensaver.changed".equals(event)) {
-            if (payload instanceof Map) {
-                Map<?, ?> data = (Map<?, ?>) payload;
-                String currentMode = (String) data.get("mode");
+            if (payload != null) {
+                String currentMode = (String) payload.get("mode");
 
                 if (targetModePreference != null && targetModePreference.equalsIgnoreCase(currentMode)) {
                     applyWidgetCleaning();
@@ -56,6 +54,11 @@ public class WidgetCleanerPlugin implements KioskPlugin {
                     restoreWidgetCleaning();
                 }
             }
+        } 
+        else if ("screensaver.stopped".equals(event)) {
+            restoreWidgetCleaning();
+        }
+    }
         } 
         else if ("screensaver.stopped".equals(event)) {
             restoreWidgetCleaning();
